@@ -118,8 +118,6 @@ const SimpleMarkdown = ({ content, className = 'dark:prose-invert', ctexTclass =
         flushList();
         return html;
     };
-    console.log(parseMarkdown(content));
-    //debug
     return React.createElement("div", { className: "prose " + className, dangerouslySetInnerHTML: { __html: parseMarkdown(content) } });
 };
 export { SimpleMarkdown };

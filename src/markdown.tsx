@@ -138,8 +138,6 @@ const SimpleMarkdown: React.FC<SimpleMarkdownProps> = ({
         flushList();
         return html;
     };
-    console.log(parseMarkdown(content));
-    //debug
     return <div className={"prose " + className} dangerouslySetInnerHTML={{ __html: parseMarkdown(content) }} />;
 };
 

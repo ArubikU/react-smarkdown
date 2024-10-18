@@ -1,4 +1,4 @@
-# @arubiki/react-markdown
+# @arubiku/react-markdown
 
 `@arubiki/react-markdown` is a React package that allows you to render Markdown content easily and efficiently, with support for code highlighting and customisable themes.
 
