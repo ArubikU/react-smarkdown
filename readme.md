@@ -1,6 +1,6 @@
 # @arubiku/react-markdown
 
-`@arubiki/react-markdown` is a React package that allows you to render Markdown content easily and efficiently, with support for code highlighting and customisable themes.
+`@arubiku/react-markdown` is a React package that allows you to render Markdown content easily and efficiently, with support for code highlighting and customisable themes.
 
 ## Example
 ![Live Demo](https://i.imgur.com/ky5ETvu.png)
@@ -11,9 +11,9 @@
 To install the package, run the following command in your terminal:
 
 ```bash
-npm install @arubiki/react-markdown
+npm install @arubiku/react-markdown
 o
-yarn add @arubiki/react-markdown
+yarn add @arubiku/react-markdown
 ```
 
 ## Usage
@@ -22,7 +22,7 @@ To use the package in your application, you must first import the HighlighterPro
 
 ```jsx
 import React from ‘react’;
-import { HighlighterProvider, SimpleMarkdown } from ‘@arubiki/react-markdown’;
+import { HighlighterProvider, SimpleMarkdown } from ‘@arubiku/react-markdown’;
 const App = () => {
     const markdownContent = `
 # Hello, World!

@@ -1,12 +1,14 @@
 {
     "dependencies": {
-        "tailwind-merge": "^2.5.3",
-        "shiki": "^1.22.0"
+        "@arubiku/react-markdown": "file:",
+        "shiki": "^1.22.0",
+        "tailwind-merge": "^2.5.3"
     },
-    
     "scripts": {
-      "build": "tsc",
-      "prepare": "npm run build"
+        "build": "tsc",
+        "prepare": "npm run build",
+        "test": "jest",
+        "test:preview": "jest-preview"
     },
     "peerDependencies": {
         "react": "^18"
@@ -15,8 +17,14 @@
         "@babel/core": "^7.25.8",
         "@babel/preset-env": "^7.25.8",
         "@babel/preset-react": "^7.25.7",
+        "@babel/preset-typescript": "^7.25.7",
+        "@testing-library/jest-dom": "^6.6.2",
+        "@testing-library/react": "^16.0.1",
+        "@types/jest": "^29.5.13",
         "@types/react": "^18.3.11",
         "babel-loader": "^9.2.1",
+        "jest": "^27.5.1",
+        "jest-preview": "^0.3.1",
         "ts-loader": "^9.5.1",
         "typescript": "^4.5.4"
     },
@@ -26,9 +34,9 @@
         "access": "public"
     },
     "types": "dist/index.d.ts",
-    "version": "1.3.2",
+    "version": "1.4.0",
     "license": "ISC",
-    "description": "React component to use markdown with code blocks syntax highlighting",
+    "description": "React component to use markdown with code blocks syntax highlighting , admonitions, math blocks and more",
     "keywords": [
         "react",
         "markdown",
