@@ -1,6 +1,24 @@
 import React from 'react';
 import { renderToString } from 'react-dom/server';
 import { UseHighlighter } from './highlighter';
+const CodeLanguageRemap = {
+  'js': 'javascript',
+  'jsx': 'javascript',
+  'ts': 'typescript',
+  'tsx': 'typescript',
+  'py': 'python',
+  'rb': 'ruby',
+  'c#': 'csharp',
+  'c++': 'cpp',
+  'cs': 'c#',
+  'kt': 'kotlin',
+  'go': 'golang',
+  'rs': 'rust',
+  'sh': 'bash',
+  'md': 'markdown',
+  'yml': 'yaml',
+  'docker': 'dockerfile',
+};
 
 //f(x) = 2x^2 + frac{3}{4}x + sqrt{x+1} + ∫_<0>^<1> x^2 dx + sum[i=1]^[n]{i^2} + lim<x->0> frac{sin(x)}{x}
 type MathToken = {
@@ -359,7 +377,7 @@ interface SimpleMarkdownProps {
         let currentParagraph = ''
         let inList = false
         let listType = ''
-        let currentCodeLanguage = ''
+        let currentCodeLanguage = 'markdown'
         let inTable = false
         let tableHeader = ''
         let tableBody = ''
@@ -416,18 +434,22 @@ interface SimpleMarkdownProps {
         }
 
         const parseInline = (text: string): string => {
-            // Bold
+          // Bold
             text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
             // Italic
             text = text.replace(/\*(.*?)\*/g, '<em>$1</em>')
+            // Underline
+            text = text.replace(/__(.*?)__/g, '<u>$1</u>')
+            // Image
+            text = text.replace(/!\[(.*?)\]\((.*?)\)/g, '<img alt="$1" src="$2">')
             // Inline code
             text = text.replace(/`([^`]+)`/g, '<code class="bg-gray-100 dark:bg-gray-800 px-1 rounded">$1</code>')
             // Iframe
             text = text.replace(/<iframe.*?src=["']([^"']+)["'].*?><\/iframe>/g, `<iframe width="100%" height="${imageHeight}" src="$1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`)
             // Links with title (alias)
-            text = text.replace(/\[([^\]]+)\]$$([^)]+)\s*"?(.*?)"?$$/g, '<a href="$2" title="$3" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline">$1</a>')
+            text = text.replace(/\[(.*?)\]\((.*?)\)\((.*?)\)/g, '<a href="$2" title="$3" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline">$1</a>')
             // Links without title
-            text = text.replace(/\[([^\]]+)\]$$([^)]+)$$/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline">$1</a>')
+            text = text.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline">$1</a>')
 
             return text
         }
@@ -454,15 +476,25 @@ interface SimpleMarkdownProps {
                 flushBlockQuote()
                 inCodeBlock = !inCodeBlock
                 if (inCodeBlock) {
-                    currentCodeLanguage = line.trim().slice(3).toLowerCase() || 'default'
+                    currentCodeLanguage = line.trim().slice(3).toLowerCase() || 'markdown'
+
+                    if (CodeLanguageRemap[currentCodeLanguage.toLowerCase()]){
+                      currentCodeLanguage = CodeLanguageRemap[currentCodeLanguage.toLowerCase()]
+                    }
+
                     html += `<pre><code class="language-${currentCodeLanguage} ${codeBlockTheme} block p-2 rounded-md my-2 overflow-x-auto">`
                     codeLines = []
                 } else {
                     html += '</code></pre>'
-                    currentCodeLanguage = ''
+                    currentCodeLanguage = 'markdown'
                 }
             } else if (inCodeBlock) {
-                html += highlightCode(line, currentCodeLanguage).replace(`<code`, `<span class="text-gray-400 dark:text-gray-500 text-sm">${codeLines.length + 1} | </span><code`)
+              let prefix = (codeLines.length + 1)+ " | "
+              if(currentCodeLanguage === 'markdown'){
+                prefix = ""
+              }
+
+                html += highlightCode(line, currentCodeLanguage).replace(`<code`, `<span class="text-gray-400 dark:text-gray-500 text-sm">${prefix}</span><code`)
                 codeLines.push(line)
             } else if (line.trim().startsWith('|') && line.includes('|')) {
                 flushParagraph()
@@ -474,12 +506,15 @@ interface SimpleMarkdownProps {
                         return
                     }
                 }
-                const cells = line.split('|').slice(1, -1).map(cell => cell.trim())
-                const row = cells.map(cell => `<td class="${tableCellClass}">${parseInline(cell)}</td>`).join('')
-                if (tableHeader === '') {
-                    tableHeader = `<tr>${row}</tr>`
-                } else {
-                    tableBody += `<tr>${row}</tr>`
+                if(!line.startsWith("|-")){
+
+                  const cells = line.split('|').slice(1, -1).map(cell => cell.trim())
+                  const row = cells.map(cell => `<td class="${tableCellClass}">${parseInline(cell)}</td>`).join('')
+                  if (tableHeader === '') {
+                      tableHeader = `<tr>${row}</tr>`
+                  } else {
+                      tableBody += `<tr>${row}</tr>`
+                  }
                 }
             } else if (line.trim().startsWith('>')) {
                 flushParagraph()

@@ -34,7 +34,7 @@
         "access": "public"
     },
     "types": "dist/index.d.ts",
-    "version": "1.4.0",
+    "version": "1.4.8",
     "license": "ISC",
     "description": "React component to use markdown with code blocks syntax highlighting , admonitions, math blocks and more",
     "keywords": [
