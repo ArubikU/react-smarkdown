@@ -433,26 +433,54 @@ interface SimpleMarkdownProps {
             }
         }
 
-        const parseInline = (text: string): string => {
-          // Bold
-            text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        const parseInline = (text) => {
+          // Split the text into code and non-code segments
+          const segments = text.split(/(`[^`]+`)/);
+          
+          return segments.map((segment, index) => {
+            // If it's an odd index, it's a code block, so don't parse it
+            if (index % 2 === 1) {
+              // Inline code
+              segment = segment.replace(/`([^`]+)`/g, '<code class="bg-gray-100 dark:bg-gray-800 px-1 rounded">$1</code>')
+              return segment;
+            }
+            
+            // For non-code segments, apply the parsing
+            let parsed = segment;
+            
+            // Bold
+            parsed = parsed.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
             // Italic
-            text = text.replace(/\*(.*?)\*/g, '<em>$1</em>')
+            parsed = parsed.replace(/\*(.*?)\*/g, '<em>$1</em>');
             // Underline
-            text = text.replace(/__(.*?)__/g, '<u>$1</u>')
-            // Image
-            text = text.replace(/!\[(.*?)\]\((.*?)\)/g, '<img alt="$1" src="$2">')
-            // Inline code
-            text = text.replace(/`([^`]+)`/g, '<code class="bg-gray-100 dark:bg-gray-800 px-1 rounded">$1</code>')
-            // Iframe
-            text = text.replace(/<iframe.*?src=["']([^"']+)["'].*?><\/iframe>/g, `<iframe width="100%" height="${imageHeight}" src="$1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`)
-            // Links with title (alias)
-            text = text.replace(/\[(.*?)\]\((.*?)\)\((.*?)\)/g, '<a href="$2" title="$3" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline">$1</a>')
-            // Links without title
-            text = text.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline">$1</a>')
+            parsed = parsed.replace(/__(.*?)__/g, '<u>$1</u>');
 
-            return text
-        }
+            // Strikethrough (new)
+            parsed = parsed.replace(/~~(.*?)~~/g, '<del>$1</del>');
+            // Superscript (new)
+            parsed = parsed.replace(/\^(.*?)\^/g, '<sup>$1</sup>');
+            // Subscript (new)
+            parsed = parsed.replace(/~(.*?)~/g, '<sub>$1</sub>');
+            // Highlight (new)
+            parsed = parsed.replace(/==(.*?)==/g, '<mark>$1</mark>');
+            //image
+            parsed = parsed.replace(/!\[(.*?)\]\((.*?)\)/g, '<img alt="$1" src="$2">')
+            // Iframe
+            parsed = parsed.replace(/<iframe.*?src=["']([^"']+)["'].*?><\/iframe>/g, `<iframe width="100%" height="${imageHeight}" src="$1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`)
+
+
+            //if line dont start with > then replace
+            if (!parsed.includes('[!')) {            // Links with title (alias)
+              parsed = parsed.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" title="$3" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline">$1</a>')
+              // Links without title
+              parsed = parsed.replace(/\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline">$1</a>');
+            }
+            // Emoji shortcodes (new, basic implementation)
+            parsed = parsed.replace(/:([a-z_]+):/g, '<span class="emoji">:$1:</span>');
+
+            return parsed;
+          }).join('');
+        };
 
         const highlightCode = (code: string, language: string) => {
             const codeComponent = UseHighlighter({ content: code, lang: language, theme: theme })
