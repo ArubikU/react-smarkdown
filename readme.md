@@ -90,7 +90,7 @@ The package supports the following Markdown syntax:
 - Blockquotes `[>]`
 - Special Block Quotes [> [!NOTE, !TIP, !IMPORTANT, !WARNING, !CAUTION]]
 - Tables
-- Images `[![alt text](image-url) or <iframe>]`
+- Images `[![alt text](image-url) or iframe]`
 - Links `[text](url)`
 - Code blocks `[```]`
 - Inline code blocks `[`code`]`
